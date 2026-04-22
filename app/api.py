@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 
 from .pdf_parser import parse_pdf, to_document_plan
 from .hwpx_generator import generate
@@ -14,6 +14,11 @@ app = FastAPI(
     description="PDF를 업로드하면 유사한 구조의 HWP(X) 템플릿을 생성합니다.",
     version="0.2.0",
 )
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/health")
