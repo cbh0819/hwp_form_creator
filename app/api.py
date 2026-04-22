@@ -2,6 +2,7 @@
 
 import tempfile
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -55,10 +56,11 @@ async def generate_hwpx(
         Path(tmp_path).unlink(missing_ok=True)
 
     stem = Path(file.filename).stem
+    encoded = quote(stem + "_template.hwpx")
     return Response(
         content=hwpx_bytes,
         media_type="application/octet-stream",
-        headers={"Content-Disposition": f'attachment; filename="{stem}_template.hwpx"'},
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded}"},
     )
 
 
