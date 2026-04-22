@@ -23,23 +23,13 @@
       box-shadow: 0 4px 24px rgba(0,0,0,0.08);
       padding: 40px 48px;
       width: 100%;
-      max-width: 560px;
+      max-width: 580px;
     }
 
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 6px;
-    }
+    h1 { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+    .subtitle { font-size: 0.9rem; color: #6b7280; margin-bottom: 32px; }
 
-    .subtitle {
-      font-size: 0.9rem;
-      color: #6b7280;
-      margin-bottom: 32px;
-    }
-
-    /* Drop zone */
+    /* ── Drop zone ── */
     .drop-zone {
       border: 2px dashed #c7d2fe;
       border-radius: 12px;
@@ -50,141 +40,86 @@
       background: #f8f9ff;
       position: relative;
     }
-
-    .drop-zone:hover, .drop-zone.drag-over {
-      border-color: #6366f1;
-      background: #eef2ff;
-    }
-
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #6366f1; background: #eef2ff; }
     .drop-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
-
     .drop-icon { font-size: 2.4rem; margin-bottom: 10px; }
+    .drop-label { font-size: 0.95rem; color: #4b5563; }
+    .drop-label span { color: #6366f1; font-weight: 600; }
+    .file-name { margin-top: 10px; font-size: 0.85rem; color: #6366f1; font-weight: 500; min-height: 20px; }
 
-    .drop-label {
-      font-size: 0.95rem;
-      color: #4b5563;
-    }
-
-    .drop-label span {
-      color: #6366f1;
-      font-weight: 600;
-    }
-
-    .file-name {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: #6366f1;
-      font-weight: 500;
-      min-height: 20px;
-    }
-
-    /* Buttons */
-    .btn-row {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-    }
+    /* ── Step buttons ── */
+    .btn-row { display: flex; gap: 12px; margin-top: 24px; }
 
     button {
-      flex: 1;
-      padding: 12px 0;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
+      flex: 1; padding: 12px 0; border: none; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
       transition: opacity 0.2s, transform 0.1s;
     }
-
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
     button:not(:disabled):active { transform: scale(0.97); }
 
-    .btn-generate {
-      background: #6366f1;
-      color: #fff;
-    }
+    .btn-start    { background: #6366f1; color: #fff; }
+    .btn-download { background: #059669; color: #fff; }
+    .btn-preview  { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
 
-    .btn-preview {
-      background: #f3f4f6;
-      color: #374151;
-      border: 1px solid #e5e7eb;
-    }
-
-    /* Status */
-    .status {
-      margin-top: 20px;
-      font-size: 0.88rem;
-      min-height: 22px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #6b7280;
-    }
-
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid #e0e7ff;
-      border-top-color: #6366f1;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
+    /* ── Progress bar ── */
+    .progress-wrap {
+      margin-top: 22px;
       display: none;
     }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .progress-msg  { font-size: 0.88rem; color: #4b5563; }
+    .progress-pct  { font-size: 0.88rem; font-weight: 700; color: #6366f1; }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .progress-track {
+      height: 10px;
+      background: #e0e7ff;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #6366f1, #818cf8);
+      transition: width 0.35s ease, background 0.4s;
+    }
+    .progress-bar.done  { background: linear-gradient(90deg, #059669, #34d399); }
+    .progress-bar.error { background: linear-gradient(90deg, #dc2626, #f87171); }
 
-    .status.loading .spinner { display: block; }
+    /* ── Status text ── */
+    .status {
+      margin-top: 14px; font-size: 0.88rem; min-height: 20px;
+      display: flex; align-items: center; gap: 8px; color: #6b7280;
+    }
     .status.success { color: #059669; }
     .status.error   { color: #dc2626; }
 
-    /* Preview panel */
+    /* ── Preview panel ── */
     .preview-panel {
-      margin-top: 24px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 16px;
-      display: none;
+      margin-top: 24px; background: #f8fafc;
+      border: 1px solid #e2e8f0; border-radius: 10px;
+      padding: 16px; display: none;
     }
-
     .preview-panel h3 {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #475569;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-size: 0.82rem; font-weight: 600; color: #475569;
+      margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em;
     }
-
     pre {
-      font-size: 0.78rem;
-      color: #1e293b;
-      white-space: pre-wrap;
-      word-break: break-all;
-      max-height: 300px;
-      overflow-y: auto;
+      font-size: 0.78rem; color: #1e293b;
+      white-space: pre-wrap; word-break: break-all;
+      max-height: 280px; overflow-y: auto;
     }
 
-    .divider {
-      border: none;
-      border-top: 1px solid #f1f5f9;
-      margin: 28px 0 20px;
-    }
-
-    .api-link {
-      text-align: center;
-      font-size: 0.82rem;
-      color: #9ca3af;
-    }
-
+    .divider { border: none; border-top: 1px solid #f1f5f9; margin: 28px 0 20px; }
+    .api-link { text-align: center; font-size: 0.82rem; color: #9ca3af; }
     .api-link a { color: #6366f1; text-decoration: none; }
     .api-link a:hover { text-decoration: underline; }
   </style>
@@ -194,6 +129,7 @@
   <h1>📄 HWP Form Creator</h1>
   <p class="subtitle">PDF를 업로드하면 유사한 구조의 HWP(X) 템플릿을 생성합니다.</p>
 
+  <!-- Drop zone -->
   <div class="drop-zone" id="dropZone">
     <input type="file" id="fileInput" accept=".pdf"/>
     <div class="drop-icon">📂</div>
@@ -201,16 +137,30 @@
     <div class="file-name" id="fileName"></div>
   </div>
 
+  <!-- Buttons -->
   <div class="btn-row">
-    <button class="btn-generate" id="btnGenerate" disabled>HWPX 생성 · 다운로드</button>
+    <button class="btn-start"    id="btnStart"    disabled>HWPX 생성</button>
+    <button class="btn-download" id="btnDownload" disabled>다운로드</button>
     <button class="btn-preview"  id="btnPreview"  disabled>구조 미리보기</button>
   </div>
 
+  <!-- Progress bar -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-header">
+      <span class="progress-msg" id="progressMsg">준비 중…</span>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <!-- Status -->
   <div class="status" id="status">
-    <div class="spinner"></div>
     <span id="statusText"></span>
   </div>
 
+  <!-- Preview -->
   <div class="preview-panel" id="previewPanel">
     <h3>문서 구조 (JSON)</h3>
     <pre id="previewContent"></pre>
@@ -221,41 +171,68 @@
 </div>
 
 <script>
-  const fileInput  = document.getElementById('fileInput');
-  const dropZone   = document.getElementById('dropZone');
-  const fileName   = document.getElementById('fileName');
-  const btnGenerate = document.getElementById('btnGenerate');
-  const btnPreview  = document.getElementById('btnPreview');
-  const statusEl   = document.getElementById('status');
-  const statusText = document.getElementById('statusText');
+  const fileInput    = document.getElementById('fileInput');
+  const dropZone     = document.getElementById('dropZone');
+  const fileNameEl   = document.getElementById('fileName');
+  const btnStart     = document.getElementById('btnStart');
+  const btnDownload  = document.getElementById('btnDownload');
+  const btnPreview   = document.getElementById('btnPreview');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar  = document.getElementById('progressBar');
+  const progressMsg  = document.getElementById('progressMsg');
+  const progressPct  = document.getElementById('progressPct');
+  const statusEl     = document.getElementById('status');
+  const statusText   = document.getElementById('statusText');
   const previewPanel   = document.getElementById('previewPanel');
   const previewContent = document.getElementById('previewContent');
 
-  // Drag & drop styling
+  let currentJobId = null;
+  let currentFile  = null;
+
+  // ── Drag & drop ──
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file) setFile(file);
+    if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
   });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) selectFile(fileInput.files[0]); });
 
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) setFile(fileInput.files[0]);
-  });
-
-  function setFile(file) {
+  function selectFile(file) {
     if (!file.name.toLowerCase().endsWith('.pdf')) {
       setStatus('error', 'PDF 파일만 업로드할 수 있습니다.');
       return;
     }
-    fileInput._file = file;
-    fileName.textContent = file.name;
-    btnGenerate.disabled = false;
+    currentFile = file;
+    currentJobId = null;
+    fileNameEl.textContent = file.name;
+    btnStart.disabled    = false;
+    btnDownload.disabled = true;
     btnPreview.disabled  = false;
+    resetProgress();
     setStatus('', '');
     previewPanel.style.display = 'none';
+  }
+
+  // ── Progress helpers ──
+  function showProgress() { progressWrap.style.display = 'block'; }
+  function hideProgress() { progressWrap.style.display = 'none'; }
+
+  function setProgress(pct, msg, state = '') {
+    showProgress();
+    progressBar.style.width = pct + '%';
+    progressBar.className = 'progress-bar' + (state ? ' ' + state : '');
+    progressMsg.textContent = msg;
+    progressPct.textContent = pct + '%';
+  }
+
+  function resetProgress() {
+    progressBar.style.width = '0%';
+    progressBar.className = 'progress-bar';
+    progressMsg.textContent = '준비 중…';
+    progressPct.textContent = '0%';
+    hideProgress();
   }
 
   function setStatus(type, text) {
@@ -263,69 +240,124 @@
     statusText.textContent = text;
   }
 
-  function getFile() {
-    return fileInput._file || fileInput.files[0];
+  function setBusy(busy) {
+    btnStart.disabled   = busy || !currentFile;
+    btnPreview.disabled = busy || !currentFile;
   }
 
-  // Generate HWPX
-  btnGenerate.addEventListener('click', async () => {
-    const file = getFile();
-    if (!file) return;
+  // ── Step 1: 생성 ──
+  btnStart.addEventListener('click', async () => {
+    if (!currentFile) return;
 
-    setStatus('loading', 'HWPX 파일을 생성하는 중...');
-    btnGenerate.disabled = true;
-    btnPreview.disabled  = true;
+    currentJobId = null;
+    btnDownload.disabled = true;
+    setBusy(true);
+    resetProgress();
+    setProgress(0, '파일 업로드 중…');
+    setStatus('', '');
     previewPanel.style.display = 'none';
 
     try {
       const form = new FormData();
-      form.append('file', file);
-
+      form.append('file', currentFile);
       const res = await fetch('/generate', { method: 'POST', body: form });
+      if (!res.ok) throw new Error((await res.json()).detail || res.statusText);
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: res.statusText }));
-        throw new Error(err.detail || res.statusText);
-      }
+      const { job_id } = await res.json();
+      currentJobId = job_id;
+
+      // ── SSE 진행도 구독 ──
+      await watchProgress(job_id);
+    } catch (e) {
+      setProgress(0, '오류', 'error');
+      setStatus('error', '오류: ' + e.message);
+      setBusy(false);
+    }
+  });
+
+  function watchProgress(jobId) {
+    return new Promise((resolve, reject) => {
+      const es = new EventSource('/progress/' + jobId);
+
+      es.onmessage = e => {
+        const data = JSON.parse(e.data);
+
+        if (data.error) {
+          es.close();
+          setProgress(100, '오류 발생', 'error');
+          setStatus('error', '오류: ' + data.error);
+          setBusy(false);
+          return reject(new Error(data.error));
+        }
+
+        setProgress(data.progress, data.message);
+
+        if (data.status === 'done') {
+          es.close();
+          setProgress(100, '생성 완료!', 'done');
+          setStatus('success', '✓ HWPX 파일이 준비됐습니다. 다운로드 버튼을 눌러주세요.');
+          btnDownload.disabled = false;
+          setBusy(false);
+          resolve();
+        }
+
+        if (data.status === 'error') {
+          es.close();
+          setProgress(100, data.message, 'error');
+          setStatus('error', '오류: ' + (data.error || data.message));
+          setBusy(false);
+          reject(new Error(data.error));
+        }
+      };
+
+      es.onerror = () => {
+        es.close();
+        setProgress(0, '연결 오류', 'error');
+        setStatus('error', '서버 연결이 끊겼습니다.');
+        setBusy(false);
+        reject(new Error('SSE connection error'));
+      };
+    });
+  }
+
+  // ── Step 2: 다운로드 ──
+  btnDownload.addEventListener('click', async () => {
+    if (!currentJobId) return;
+
+    try {
+      const res = await fetch('/download/' + currentJobId);
+      if (!res.ok) throw new Error((await res.json()).detail || res.statusText);
 
       const blob = await res.blob();
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
-      const stem = file.name.replace(/\.pdf$/i, '');
+      const disposition = res.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename\*=UTF-8''(.+)/i);
+      a.download = match ? decodeURIComponent(match[1]) : 'output_template.hwpx';
       a.href = url;
-      a.download = stem + '_template.hwpx';
       a.click();
       URL.revokeObjectURL(url);
 
-      setStatus('success', '✓ 다운로드가 시작됐습니다.');
+      btnDownload.disabled = true;
+      currentJobId = null;
+      setStatus('success', '✓ 다운로드 완료');
     } catch (e) {
-      setStatus('error', '오류: ' + e.message);
-    } finally {
-      btnGenerate.disabled = false;
-      btnPreview.disabled  = false;
+      setStatus('error', '다운로드 오류: ' + e.message);
     }
   });
 
-  // Preview JSON
+  // ── 미리보기 ──
   btnPreview.addEventListener('click', async () => {
-    const file = getFile();
-    if (!file) return;
-
-    setStatus('loading', '문서 구조를 분석하는 중...');
-    btnGenerate.disabled = true;
-    btnPreview.disabled  = true;
+    if (!currentFile) return;
+    setBusy(true);
+    setStatus('', '');
     previewPanel.style.display = 'none';
 
     try {
       const form = new FormData();
-      form.append('file', file);
-
+      form.append('file', currentFile);
       const res = await fetch('/preview', { method: 'POST', body: form });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: res.statusText }));
-        throw new Error(err.detail || res.statusText);
-      }
+      if (!res.ok) throw new Error((await res.json()).detail || res.statusText);
 
       const json = await res.json();
       previewContent.textContent = JSON.stringify(json, null, 2);
@@ -334,8 +366,7 @@
     } catch (e) {
       setStatus('error', '오류: ' + e.message);
     } finally {
-      btnGenerate.disabled = false;
-      btnPreview.disabled  = false;
+      setBusy(false);
     }
   });
 </script>
