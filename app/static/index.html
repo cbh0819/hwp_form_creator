@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HWP Form Creator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+      background: #f4f6fb;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 40px 48px;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed #c7d2fe;
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: #f8f9ff;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #6366f1;
+      background: #eef2ff;
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon { font-size: 2.4rem; margin-bottom: 10px; }
+
+    .drop-label {
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    .drop-label span {
+      color: #6366f1;
+      font-weight: 600;
+    }
+
+    .file-name {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #6366f1;
+      font-weight: 500;
+      min-height: 20px;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button:not(:disabled):active { transform: scale(0.97); }
+
+    .btn-generate {
+      background: #6366f1;
+      color: #fff;
+    }
+
+    .btn-preview {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+    }
+
+    /* Status */
+    .status {
+      margin-top: 20px;
+      font-size: 0.88rem;
+      min-height: 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6b7280;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #e0e7ff;
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status.loading .spinner { display: block; }
+    .status.success { color: #059669; }
+    .status.error   { color: #dc2626; }
+
+    /* Preview panel */
+    .preview-panel {
+      margin-top: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      display: none;
+    }
+
+    .preview-panel h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    pre {
+      font-size: 0.78rem;
+      color: #1e293b;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #f1f5f9;
+      margin: 28px 0 20px;
+    }
+
+    .api-link {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #9ca3af;
+    }
+
+    .api-link a { color: #6366f1; text-decoration: none; }
+    .api-link a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>📄 HWP Form Creator</h1>
+  <p class="subtitle">PDF를 업로드하면 유사한 구조의 HWP(X) 템플릿을 생성합니다.</p>
+
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept=".pdf"/>
+    <div class="drop-icon">📂</div>
+    <div class="drop-label">PDF 파일을 끌어다 놓거나 <span>클릭하여 선택</span>하세요</div>
+    <div class="file-name" id="fileName"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-generate" id="btnGenerate" disabled>HWPX 생성 · 다운로드</button>
+    <button class="btn-preview"  id="btnPreview"  disabled>구조 미리보기</button>
+  </div>
+
+  <div class="status" id="status">
+    <div class="spinner"></div>
+    <span id="statusText"></span>
+  </div>
+
+  <div class="preview-panel" id="previewPanel">
+    <h3>문서 구조 (JSON)</h3>
+    <pre id="previewContent"></pre>
+  </div>
+
+  <hr class="divider"/>
+  <div class="api-link">REST API 문서: <a href="/docs" target="_blank">/docs</a></div>
+</div>
+
+<script>
+  const fileInput  = document.getElementById('fileInput');
+  const dropZone   = document.getElementById('dropZone');
+  const fileName   = document.getElementById('fileName');
+  const btnGenerate = document.getElementById('btnGenerate');
+  const btnPreview  = document.getElementById('btnPreview');
+  const statusEl   = document.getElementById('status');
+  const statusText = document.getElementById('statusText');
+  const previewPanel   = document.getElementById('previewPanel');
+  const previewContent = document.getElementById('previewContent');
+
+  // Drag & drop styling
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) setFile(file);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) setFile(fileInput.files[0]);
+  });
+
+  function setFile(file) {
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      setStatus('error', 'PDF 파일만 업로드할 수 있습니다.');
+      return;
+    }
+    fileInput._file = file;
+    fileName.textContent = file.name;
+    btnGenerate.disabled = false;
+    btnPreview.disabled  = false;
+    setStatus('', '');
+    previewPanel.style.display = 'none';
+  }
+
+  function setStatus(type, text) {
+    statusEl.className = 'status' + (type ? ' ' + type : '');
+    statusText.textContent = text;
+  }
+
+  function getFile() {
+    return fileInput._file || fileInput.files[0];
+  }
+
+  // Generate HWPX
+  btnGenerate.addEventListener('click', async () => {
+    const file = getFile();
+    if (!file) return;
+
+    setStatus('loading', 'HWPX 파일을 생성하는 중...');
+    btnGenerate.disabled = true;
+    btnPreview.disabled  = true;
+    previewPanel.style.display = 'none';
+
+    try {
+      const form = new FormData();
+      form.append('file', file);
+
+      const res = await fetch('/generate', { method: 'POST', body: form });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || res.statusText);
+      }
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      const stem = file.name.replace(/\.pdf$/i, '');
+      a.href = url;
+      a.download = stem + '_template.hwpx';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setStatus('success', '✓ 다운로드가 시작됐습니다.');
+    } catch (e) {
+      setStatus('error', '오류: ' + e.message);
+    } finally {
+      btnGenerate.disabled = false;
+      btnPreview.disabled  = false;
+    }
+  });
+
+  // Preview JSON
+  btnPreview.addEventListener('click', async () => {
+    const file = getFile();
+    if (!file) return;
+
+    setStatus('loading', '문서 구조를 분석하는 중...');
+    btnGenerate.disabled = true;
+    btnPreview.disabled  = true;
+    previewPanel.style.display = 'none';
+
+    try {
+      const form = new FormData();
+      form.append('file', file);
+
+      const res = await fetch('/preview', { method: 'POST', body: form });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || res.statusText);
+      }
+
+      const json = await res.json();
+      previewContent.textContent = JSON.stringify(json, null, 2);
+      previewPanel.style.display = 'block';
+      setStatus('success', '✓ 분석 완료');
+    } catch (e) {
+      setStatus('error', '오류: ' + e.message);
+    } finally {
+      btnGenerate.disabled = false;
+      btnPreview.disabled  = false;
+    }
+  });
+</script>
+</body>
+</html>
