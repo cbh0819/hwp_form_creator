@@ -61,19 +61,134 @@ document.hwpx (ZIP)
 - Python 3.11 이상
 - PyMuPDF >= 1.23.0
 
-### 설치
+---
+
+### Windows
+
+**1. Python 설치**
+
+[python.org](https://www.python.org/downloads/)에서 Python 3.11 이상을 내려받아 설치합니다.  
+설치 시 **"Add Python to PATH"** 옵션을 반드시 체크하세요.
+
+**2. 저장소 클론 및 의존성 설치**
+
+```powershell
+git clone https://github.com/cbh0819/hwp_form_creator.git
+cd hwp_form_creator
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+**3. 서버 실행**
+
+```powershell
+uvicorn main:app --reload
+```
+
+**4. API 호출 (PowerShell)**
+
+```powershell
+# /generate
+Invoke-RestMethod -Uri "http://localhost:8000/generate" `
+  -Method Post `
+  -Form @{ file = Get-Item "your_document.pdf" } `
+  -OutFile "output_template.hwpx"
+
+# /preview
+Invoke-RestMethod -Uri "http://localhost:8000/preview" `
+  -Method Post `
+  -Form @{ file = Get-Item "your_document.pdf" }
+```
+
+> curl이 설치되어 있다면 Linux/macOS와 동일한 curl 명령을 사용할 수 있습니다.
+
+---
+
+### macOS
+
+**1. Python 설치**
+
+```bash
+# Homebrew를 이용한 설치 (권장)
+brew install python@3.11
+```
+
+또는 [python.org](https://www.python.org/downloads/)에서 직접 설치합니다.
+
+**2. 저장소 클론 및 의존성 설치**
 
 ```bash
 git clone https://github.com/cbh0819/hwp_form_creator.git
 cd hwp_form_creator
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 서버 실행
+**3. 서버 실행**
 
 ```bash
 uvicorn main:app --reload
 ```
+
+**4. API 호출**
+
+```bash
+# /generate
+curl -X POST http://localhost:8000/generate \
+  -F "file=@your_document.pdf" \
+  -o output_template.hwpx
+
+# /preview
+curl -X POST http://localhost:8000/preview \
+  -F "file=@your_document.pdf"
+```
+
+---
+
+### Linux
+
+**1. Python 설치**
+
+```bash
+# Ubuntu / Debian
+sudo apt update && sudo apt install -y python3.11 python3.11-venv python3-pip
+
+# Fedora / RHEL
+sudo dnf install -y python3.11
+```
+
+**2. 저장소 클론 및 의존성 설치**
+
+```bash
+git clone https://github.com/cbh0819/hwp_form_creator.git
+cd hwp_form_creator
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**3. 서버 실행**
+
+```bash
+uvicorn main:app --reload
+```
+
+**4. API 호출**
+
+```bash
+# /generate
+curl -X POST http://localhost:8000/generate \
+  -F "file=@your_document.pdf" \
+  -o output_template.hwpx
+
+# /preview
+curl -X POST http://localhost:8000/preview \
+  -F "file=@your_document.pdf"
+```
+
+---
 
 서버가 실행되면 `http://localhost:8000/docs` 에서 Swagger UI를 통해 바로 테스트할 수 있습니다.
 
