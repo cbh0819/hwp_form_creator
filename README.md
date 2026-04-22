@@ -147,6 +147,43 @@ curl -X POST http://localhost:8000/preview \
 
 ---
 
+### WSL (Windows Subsystem for Linux)
+
+WSL에서는 기본 바인딩(`127.0.0.1`)이 Windows 브라우저에서 접근되지 않으므로 반드시 `--host 0.0.0.0`을 지정해야 합니다.
+
+**1. Python 및 의존성 설치**
+
+```bash
+sudo apt update && sudo apt install -y python3.11 python3.11-venv python3-pip
+git clone https://github.com/cbh0819/hwp_form_creator.git
+cd hwp_form_creator
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**2. 서버 실행**
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0
+```
+
+**3. 접속**
+
+| 위치 | URL |
+|------|-----|
+| WSL 터미널 내부 | `http://127.0.0.1:8000` |
+| Windows 브라우저 | `http://localhost:8000` |
+
+Windows 브라우저에서 접속이 안 될 경우 WSL IP를 직접 확인합니다.
+
+```bash
+hostname -I | awk '{print $1}'
+# 출력 예: 172.24.x.x → Windows 브라우저에서 http://172.24.x.x:8000 접속
+```
+
+---
+
 ### Linux
 
 **1. Python 설치**
