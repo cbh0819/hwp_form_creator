@@ -32,6 +32,7 @@ class RawTextBlock:
 class RawTable:
     rows: List[List[str]] = field(default_factory=list)
     bbox: tuple = field(default_factory=tuple)   # (x0, y0, x1, y1) in pts
+    y_ratio: float = 0.0                         # normalised vertical position (0=top)
     page_num: int = 0
 
 
@@ -124,8 +125,10 @@ def parse_pdf(pdf_path: str) -> ParsedDocument:
                         if any(cell for cell in row)
                     ]
                     if cleaned:
+                        y_ratio = tbl.bbox[1] / page_h if page_h else 0.0
                         page_tables.append(
-                            RawTable(rows=cleaned, bbox=tbl.bbox, page_num=page_num)
+                            RawTable(rows=cleaned, bbox=tbl.bbox,
+                                     y_ratio=y_ratio, page_num=page_num)
                         )
             except Exception:
                 pass  # find_tables() not available for this page type
@@ -191,37 +194,46 @@ def _build_thresholds(blocks: List[RawTextBlock]) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Prompt-text serialiser (for LLM input)
+# DocumentPlan builder (no LLM required)
 # ---------------------------------------------------------------------------
 
-def to_prompt_text(doc: ParsedDocument) -> str:
-    """Serialises the parsed document into a compact tagged string for Claude."""
+def to_document_plan(doc: ParsedDocument) -> "DocumentPlan":
+    """Converts ParsedDocument directly into a DocumentPlan without an LLM."""
+    from .models import (
+        DocumentPlan, PageSettings,
+        HeadingBlock, ParagraphBlock, TableBlock,
+    )
+
     thresholds = _build_thresholds(doc.text_blocks)
 
-    lines: List[str] = [
-        f"[문서 정보] 페이지 수: {doc.page_count}, "
-        f"용지 크기: {doc.page_width_mm}×{doc.page_height_mm}mm",
-        "",
-        "[텍스트 블록]",
-    ]
+    # Build unified reading-order list: (page_num, y_ratio, item)
+    items: list = []
+    for tb in doc.text_blocks:
+        items.append((tb.page_num, tb.y_ratio, "text", tb))
+    for tbl in doc.tables:
+        items.append((tbl.page_num, tbl.y_ratio, "table", tbl))
+    items.sort(key=lambda x: (x[0], x[1]))
 
-    for block in doc.text_blocks:
-        level = _classify_level(block.font_size, thresholds)
-        if level == 0 and block.is_bold:
-            # Bold body text → treat as H3
-            level = 3
+    blocks = []
+    title = ""
+    for _, _, kind, item in items:
+        if kind == "text":
+            level = _classify_level(item.font_size, thresholds)
+            if level == 0 and item.is_bold:
+                level = 3
 
-        tag = {1: "[H1]", 2: "[H2]", 3: "[H3]"}.get(level, "")
-        lines.append(f"{tag}{block.text}")
+            if level > 0:
+                if not title and level == 1:
+                    title = item.text
+                blocks.append(HeadingBlock(content=item.text, level=level))
+            else:
+                blocks.append(ParagraphBlock(content=item.text))
+        else:
+            has_header = len(item.rows) > 1
+            blocks.append(TableBlock(rows=item.rows, has_header=has_header))
 
-    if doc.tables:
-        lines.append("")
-        lines.append("[표 목록]")
-        for i, tbl in enumerate(doc.tables, 1):
-            lines.append(f"표 {i} (페이지 {tbl.page_num + 1}):")
-            for row in tbl.rows[:8]:
-                lines.append("  | " + " | ".join(row) + " |")
-            if len(tbl.rows) > 8:
-                lines.append(f"  ... (총 {len(tbl.rows)}행)")
-
-    return "\n".join(lines)
+    page = PageSettings(
+        width_mm=round(doc.page_width_mm),
+        height_mm=round(doc.page_height_mm),
+    )
+    return DocumentPlan(title=title, page=page, blocks=blocks)
